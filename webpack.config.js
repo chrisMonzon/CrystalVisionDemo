@@ -1,4 +1,5 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const path = require('path');
 
 const src = path.resolve(__dirname, 'src');
@@ -17,17 +18,7 @@ module.exports = {
       },
       {
         test: /\.(glsl|vs|fs|vert|frag)$/,
-        type: 'asset/source', // Webpack 5 built-in loader for raw text
-      },
-      {
-        // Transpile the whole three-custom-shader-material package
-        test: /three-custom-shader-material.*\.js$/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: ['@babel/preset-env'],
-          },
-        },
+        type: 'asset/source',
       },
     ],
   },
@@ -37,18 +28,25 @@ module.exports = {
   output: {
     filename: 'index.js',
     path: dist,
-    clean: true, // wipe dist/ before every build
+    clean: true, // clears old dist before build
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.join(src, 'index.html'), // take src/index.html
-      filename: 'index.html',                 // output dist/index.html
+      template: path.join(src, 'index.html'),
+    }),
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: path.join(src, 'models'), to: 'models' },
+        { from: path.join(src, 'textures'), to: 'textures' },
+        { from: path.join(src, 'style.css'), to: '' },
+      ],
     }),
   ],
   devServer: {
-    static: src, // serve static assets (textures, models) from src/
+    static: src,
   },
 };
+
 
 
 
