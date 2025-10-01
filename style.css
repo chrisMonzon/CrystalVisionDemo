@@ -1,0 +1,56 @@
+#menu {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.8);
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  display: none; /* hidden by default */
+  z-index: 10;
+}
+
+#closeBtn {
+  background-color: #ccc; /* match your keyframe start/end */
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  color: black;
+}
+
+#closeBtn2 {
+  background-color: #ccc; /* match your keyframe start/end */
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  color: black;
+}
+
+#closeBtn3 {
+  background-color: #ccc; /* match your keyframe start/end */
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  color: black;
+}
+
+@keyframes flashGreen {
+    0% { background-color: #ccc; } /* Start with default color */
+    50% { background-color: green; } /* Flash green */
+    100% { background-color: #ccc; } /* Return to default */
+}
+
+@keyframes flashRed {
+    0% { background-color: #ccc; } /* Start with default color */
+    50% { background-color: rgb(225, 9, 9); } /* Flash green */
+    100% { background-color: #ccc; } /* Return to default */
+}
+
+.flash {
+    animation: flashGreen 0.3s ease-in-out; /* Apply the animation */
+}
+
+.flash2 {
+    animation: flashRed 0.3s ease-in-out; /* Apply the animation */
+}
