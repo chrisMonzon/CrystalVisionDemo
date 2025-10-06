@@ -4,6 +4,7 @@ import * as THREE from 'three'
 import { CameraHelper } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { mode } from '../webpack.config';
 
 
 // SCENE
@@ -42,8 +43,26 @@ const qmBox = new THREE.Box3();
 
 // MODEL WITH ANIMATIONS
 var characterControls: CharacterControls
-new GLTFLoader().load('models/Soldier.glb', function (gltf) {
+// new GLTFLoader().load('models/Soldier.glb', function (gltf) {
+//     const model = gltf.scene;
+//     model.traverse(function (object: any) {
+//         if (object.isMesh) object.castShadow = true;
+//     });
+//     scene.add(model);
+
+//     const gltfAnimations: THREE.AnimationClip[] = gltf.animations;
+//     const mixer = new THREE.AnimationMixer(model);
+//     const animationsMap: Map<string, THREE.AnimationAction> = new Map()
+//     gltfAnimations.filter(a => a.name != 'TPose').forEach((a: THREE.AnimationClip) => {
+//         animationsMap.set(a.name, mixer.clipAction(a))
+//     })
+
+//     characterControls = new CharacterControls(model, mixer, animationsMap, orbitControls, camera,  'Idle')
+// });
+
+new GLTFLoader().load('models/boy3.glb', function (gltf) {
     const model = gltf.scene;
+    model.position.y = 0.075;
     model.traverse(function (object: any) {
         if (object.isMesh) object.castShadow = true;
     });
@@ -53,6 +72,7 @@ new GLTFLoader().load('models/Soldier.glb', function (gltf) {
     const mixer = new THREE.AnimationMixer(model);
     const animationsMap: Map<string, THREE.AnimationAction> = new Map()
     gltfAnimations.filter(a => a.name != 'TPose').forEach((a: THREE.AnimationClip) => {
+        console.log("Animation exists");
         animationsMap.set(a.name, mixer.clipAction(a))
     })
 
@@ -407,7 +427,7 @@ function generateFloor() {
     const textureLoader = new THREE.TextureLoader();
     const placeholder = textureLoader.load("./textures/placeholder/placeholder.png");
     // const sandBaseColor = textureLoader.load("./textures/sand/Sand 002_COLOR.jpg");
-    const sandBaseColor = textureLoader.load("./textures/outdoors/grasscool.png");
+    const sandBaseColor = textureLoader.load("./textures/grass/grass2.png");
     // const sandBaseColor = textureLoader.load("./textures/outdoors/Texture_11_Diffuse.png");
     // const sandNormalMap = textureLoader.load("./textures/sand/Sand 002_NRM.jpg");
     const sandNormalMap = textureLoader.load("./textures/outdoors/Texture_10_2_Normal.png");
