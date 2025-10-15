@@ -23,13 +23,13 @@ const clickSoundCorrect = new THREE.Audio(listener);
 const clickSoundWrong = new THREE.Audio(listener);
 
 const audioLoaderCorrect = new THREE.AudioLoader();
-audioLoaderCorrect.load('/audio/correct.mp3', (buffer) => {
+audioLoaderCorrect.load('./audio/correct.mp3', (buffer) => {
     clickSoundCorrect.setBuffer(buffer);
     clickSoundCorrect.setVolume(0.5);
 });
 
 const audioLoaderWrong = new THREE.AudioLoader();
-audioLoaderWrong.load('/audio/wrong.mp3', (buffer) => {
+audioLoaderWrong.load('./audio/wrong.mp3', (buffer) => {
     clickSoundWrong.setBuffer(buffer);
     clickSoundWrong.setVolume(0.5);
 });
