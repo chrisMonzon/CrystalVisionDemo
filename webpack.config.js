@@ -38,6 +38,7 @@ module.exports = {
       patterns: [
         { from: path.join(src, 'models'), to: 'models' },
         { from: path.join(src, 'textures'), to: 'textures' },
+        { from: path.join(src, 'audio'), to: 'audio' },
         { from: path.join(src, 'style.css'), to: '' },
       ],
     }),
