@@ -25,11 +25,15 @@ export class CharacterControls {
     fadeDuration: number = 0.2
     runVelocity = 5
     walkVelocity = 2
+    
+    audioListener: THREE.AudioListener
+    walkSound: THREE.Audio
 
     constructor(model: THREE.Group,
         mixer: THREE.AnimationMixer, animationsMap: Map<string, THREE.AnimationAction>,
         orbitControl: OrbitControls, camera: THREE.Camera,
-        currentAction: string) {
+        currentAction: string,
+        audioLoader: THREE.AudioLoader) {
         this.model = model
         this.mixer = mixer
         this.animationsMap = animationsMap
@@ -42,6 +46,20 @@ export class CharacterControls {
         this.orbitControl = orbitControl
         this.camera = camera
         this.updateCameraTarget(0,0)
+
+        this.audioListener = new THREE.AudioListener()
+        this.camera.add(this.audioListener)
+
+        this.walkSound = new THREE.Audio(this.audioListener)
+
+        // Load sound file
+        audioLoader.load('/audio/walking.mp3', (buffer) => {
+            this.walkSound.setBuffer(buffer)
+            this.walkSound.setLoop(true)
+            this.walkSound.setVolume(0.5)
+            this.walkSound.setPlaybackRate(0.73)
+        })
+        
     }
 
     public switchRunToggle() {
@@ -74,6 +92,9 @@ export class CharacterControls {
 
         if (this.currentAction == 'Run' || this.currentAction == 'Walk') {
             // calculate towards camera direction
+            if (!this.walkSound.isPlaying && this.walkSound.buffer) {
+                this.walkSound.play()
+            }
             var angleYCameraDirection = Math.atan2(
                     (this.camera.position.x - this.model.position.x), 
                     (this.camera.position.z - this.model.position.z))
@@ -99,6 +120,10 @@ export class CharacterControls {
             this.model.position.x += moveX
             this.model.position.z += moveZ
             this.updateCameraTarget(moveX, moveZ)
+        } else {
+            if (this.walkSound.isPlaying) {
+                this.walkSound.stop()
+            }
         }
     }
 

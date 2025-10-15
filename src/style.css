@@ -7,12 +7,12 @@
   color: white;
   padding: 20px;
   border-radius: 10px;
-  display: none; /* hidden by default */
+  display: none;
   z-index: 10;
 }
 
 #closeBtn {
-  background-color: #ccc; /* match your keyframe start/end */
+  background-color: #ccc; 
   border: none;
   padding: 10px 20px;
   cursor: pointer;
@@ -20,7 +20,7 @@
 }
 
 #closeBtn2 {
-  background-color: #ccc; /* match your keyframe start/end */
+  background-color: #ccc; 
   border: none;
   padding: 10px 20px;
   cursor: pointer;
@@ -28,7 +28,7 @@
 }
 
 #closeBtn3 {
-  background-color: #ccc; /* match your keyframe start/end */
+  background-color: #ccc; 
   border: none;
   padding: 10px 20px;
   cursor: pointer;
@@ -36,21 +36,57 @@
 }
 
 @keyframes flashGreen {
-    0% { background-color: #ccc; } /* Start with default color */
-    50% { background-color: green; } /* Flash green */
-    100% { background-color: #ccc; } /* Return to default */
+    0% { background-color: #ccc; } 
+    50% { background-color: green; } 
+    100% { background-color: #ccc; } 
 }
 
 @keyframes flashRed {
-    0% { background-color: #ccc; } /* Start with default color */
-    50% { background-color: rgb(225, 9, 9); } /* Flash green */
-    100% { background-color: #ccc; } /* Return to default */
+    0% { background-color: #ccc; } 
+    50% { background-color: rgb(225, 9, 9); } 
+    100% { background-color: #ccc; } 
 }
 
 .flash {
-    animation: flashGreen 0.3s ease-in-out; /* Apply the animation */
+    animation: flashGreen 0.3s ease-in-out; 
 }
 
 .flash2 {
-    animation: flashRed 0.3s ease-in-out; /* Apply the animation */
+    animation: flashRed 0.3s ease-in-out;
+}
+
+#healthbar-container {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px; /* space between label and bar */
+  z-index: 9999;
+  font-family: sans-serif;
+  color: white;
+  text-shadow: 1px 1px 2px black;
+}
+
+#health-label {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+#healthbar-bg {
+  width: 200px;
+  height: 20px;
+  background-color: #333;
+  border: 2px solid #000;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+#healthbar {
+  width: 100%;
+  height: 100%;
+  background-color: #00ff00;
+  border-radius: 8px;
+  transition: width 0.25s ease-out;
 }

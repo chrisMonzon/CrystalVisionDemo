@@ -17,6 +17,23 @@ camera.position.y = 5;
 camera.position.z = 5;
 camera.position.x = 0;
 
+const listener = new THREE.AudioListener();
+camera.add(listener);
+const clickSoundCorrect = new THREE.Audio(listener);
+const clickSoundWrong = new THREE.Audio(listener);
+
+const audioLoaderCorrect = new THREE.AudioLoader();
+audioLoaderCorrect.load('/audio/correct.mp3', (buffer) => {
+    clickSoundCorrect.setBuffer(buffer);
+    clickSoundCorrect.setVolume(0.5);
+});
+
+const audioLoaderWrong = new THREE.AudioLoader();
+audioLoaderWrong.load('/audio/wrong.mp3', (buffer) => {
+    clickSoundWrong.setBuffer(buffer);
+    clickSoundWrong.setVolume(0.5);
+});
+
 // RENDERER
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -75,8 +92,8 @@ new GLTFLoader().load('models/boy3.glb', function (gltf) {
         console.log("Animation exists");
         animationsMap.set(a.name, mixer.clipAction(a))
     })
-
-    characterControls = new CharacterControls(model, mixer, animationsMap, orbitControls, camera,  'Idle')
+    const audioLoader = new THREE.AudioLoader()
+    characterControls = new CharacterControls(model, mixer, animationsMap, orbitControls, camera,  'Idle', audioLoader)
 });
 
 let questionMark: THREE.Object3D | null = null;
@@ -368,7 +385,9 @@ document.body.appendChild(renderer.domElement);
 animate();
 const closeBtn = document.getElementById("closeBtn");
     closeBtn?.addEventListener("click", () => {
-        if (!closeBtn) return; // TypeScript now knows closeBtn exists
+        if (!closeBtn) return; 
+        if (clickSoundCorrect.isPlaying) clickSoundCorrect.stop();
+        clickSoundCorrect.play();
 
         closeBtn.classList.add('flash');
 
@@ -385,7 +404,10 @@ const closeBtn = document.getElementById("closeBtn");
 
 const closeBtn2 = document.getElementById("closeBtn2");
     closeBtn2?.addEventListener("click", () => {
-        if (!closeBtn2) return; // TypeScript now knows closeBtn exists
+        if (!closeBtn2) return; 
+
+        if (clickSoundWrong.isPlaying) clickSoundWrong.stop();
+        clickSoundWrong.play();
 
         closeBtn2.classList.add('flash2');
 
@@ -400,7 +422,10 @@ const closeBtn2 = document.getElementById("closeBtn2");
 
 const closeBtn3 = document.getElementById("closeBtn3");
     closeBtn3?.addEventListener("click", () => {
-        if (!closeBtn3) return; // TypeScript now knows closeBtn exists
+        if (!closeBtn3) return; 
+
+        if (clickSoundWrong.isPlaying) clickSoundWrong.stop();
+        clickSoundWrong.play();
 
         closeBtn3.classList.add('flash2');
 
