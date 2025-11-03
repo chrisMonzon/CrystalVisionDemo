@@ -22,6 +22,22 @@ camera.add(listener);
 const clickSoundCorrect = new THREE.Audio(listener);
 const clickSoundWrong = new THREE.Audio(listener);
 
+window.addEventListener('click', () => {
+  const audioContext = listener.context;
+  if (audioContext.state === 'suspended') {
+    audioContext.resume();
+    console.log('AudioContext resumed after click');
+  }
+});
+
+window.addEventListener('keydown', () => {
+  const audioContext = listener.context;
+  if (audioContext.state === 'suspended') {
+    audioContext.resume();
+  }
+});
+
+
 const audioLoaderCorrect = new THREE.AudioLoader();
 audioLoaderCorrect.load('./audio/correct.mp3', (buffer) => {
     clickSoundCorrect.setBuffer(buffer);
