@@ -1,4 +1,4 @@
-#menu {
+#menu0, #menu1, #menu2{
   position: absolute;
   top: 30%;
   left: 50%;
@@ -11,30 +11,13 @@
   z-index: 10;
 }
 
-#closeBtn {
+#closeBtn0, #closeBtn0_2, #closeBtn0_3, #closeBtn1, #closeBtn1_2, #closeBtn1_3, #closeBtn2, #closeBtn2_2, #closeBtn2_3 {
   background-color: #ccc; 
   border: none;
   padding: 10px 20px;
   cursor: pointer;
   color: black;
 }
-
-#closeBtn2 {
-  background-color: #ccc; 
-  border: none;
-  padding: 10px 20px;
-  cursor: pointer;
-  color: black;
-}
-
-#closeBtn3 {
-  background-color: #ccc; 
-  border: none;
-  padding: 10px 20px;
-  cursor: pointer;
-  color: black;
-}
-
 @keyframes flashGreen {
     0% { background-color: #ccc; } 
     50% { background-color: green; } 
@@ -89,4 +72,46 @@
   background-color: #00ff00;
   border-radius: 8px;
   transition: width 0.25s ease-out;
+}
+
+#gameOverScreen {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  color: white;
+  font-family: sans-serif;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 10;
+}
+
+#gameOverScreen h1 {
+  font-size: 3em;
+  margin-bottom: 10px;
+}
+
+#gameOverScreen button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 1.2em;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  background-color: #f44336;
+  color: white;
+  transition: 0.2s;
+}
+
+#gameOverScreen button:hover {
+  background-color: #c62828;
+}
+
+#gameOverScreen {
+  display: flex; /* Use flex for centering */
 }

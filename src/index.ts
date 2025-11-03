@@ -73,6 +73,7 @@ generateFloor()
 
 const playerBox = new THREE.Box3();
 const qmBox = new THREE.Box3();
+const treeBox = new THREE.Box3();
 
 // MODEL WITH ANIMATIONS
 var characterControls: CharacterControls
@@ -113,6 +114,7 @@ new GLTFLoader().load('models/boy3.glb', function (gltf) {
 });
 
 let questionMark: THREE.Object3D | null = null;
+let questionMarks: THREE.Object3D[] = [];
 
 new GLTFLoader().load('models/qm2.glb', function (gltf) {
   questionMark = gltf.scene;
@@ -132,7 +134,18 @@ new GLTFLoader().load('models/qm2.glb', function (gltf) {
             }
     });
   // Place the group where you want the object
-  scene.add(questionMark);
+  // scene.add(questionMark);
+  const positions = [
+    new THREE.Vector3(0, 1, 4),
+    new THREE.Vector3(2.5, 1, 0),
+    new THREE.Vector3(-1.5, 1, -3.5)
+  ];
+  positions.forEach(pos => {
+    const qmClone = questionMark.clone(true);
+    qmClone.position.copy(pos);
+    scene.add(qmClone);
+    questionMarks.push(qmClone);
+  });
 });
 
 // https://douges.dev/static/tree.glb'
@@ -176,6 +189,8 @@ new GLTFLoader().load('models/qm2.glb', function (gltf) {
 // });
 
 // https://douges.dev/static/tree.glb
+// const trees = [];
+const trees: THREE.Object3D[] = [];
 // new GLTFLoader().load('models/giant_low_poly_tree.glb', function (gltf) {
     new GLTFLoader().load('https://douges.dev/static/tree.glb', function (gltf) {
   const model = gltf.scene;
@@ -226,6 +241,7 @@ new GLTFLoader().load('models/qm2.glb', function (gltf) {
     const treeClone = model.clone(true);
     treeClone.position.copy(pos);
     scene.add(treeClone);
+    trees.push(treeClone);
   });
 
   // Save foliageMaterial so animate() can drive wind
@@ -352,6 +368,35 @@ document.addEventListener('keyup', (event) => {
 
 const clock = new THREE.Clock();
 // ANIMATE
+var isTouchingTree = false;
+let health = 120;
+const healthBar = document.getElementById("healthbar");
+
+function decreaseHealth(amount: number) {
+  health = Math.max(0, health - amount);
+  healthBar.style.width = `${health}%`;
+
+  if (health > 60) healthBar.style.backgroundColor = "#00ff00";
+  else if (health > 30) healthBar.style.backgroundColor = "yellow";
+  else healthBar.style.backgroundColor = "red";
+
+  if (health <= 0) {
+    const gameOverScreen = document.getElementById("gameOverScreen");
+    if (gameOverScreen) gameOverScreen.style.display = "flex";
+  }
+}
+
+const restartBtn = document.getElementById("restartBtn");
+if (restartBtn) {
+  restartBtn.addEventListener("click", () => {
+    health = 100;
+    healthBar.style.width = `${health}%`;
+    healthBar.style.backgroundColor = "#00ff00";
+    const gameOverScreen = document.getElementById("gameOverScreen");
+    if (gameOverScreen) gameOverScreen.style.display = "none";
+  });
+}
+
 function animate() {
     let mixerUpdateDelta = clock.getDelta();
     if (characterControls) {
@@ -364,31 +409,46 @@ function animate() {
         foliageMaterial.userData.shader.uniforms.u_windTime.value += mixerUpdateDelta;
     }
 
-    if (questionMark) {
-        // console.log("QMMM");
-    questionMark.rotation.y += 0.01; // spins in place
-    questionMark.position.set(2, 1.5, 3);
+    if (questionMarks.length > 0) {
+      for (const qm of questionMarks) {
+        qm.rotation.y += 0.01;
+      }
     }
 
-    if (characterControls && questionMark) {
-        // Update player bounding box
-        playerBox.setFromObject(characterControls.model); // assuming CharacterControls exposes model
+     if (characterControls && questionMarks.length > 0) {
+      playerBox.setFromObject(characterControls.model); // Update player bounding box
 
-        // Update question mark bounding box
-        qmBox.setFromObject(questionMark);
+      for (let i = 0; i < questionMarks.length; i++) {
+        const qm = questionMarks[i];
+        qmBox.setFromObject(qm);
 
-        // Check for intersection
         if (playerBox.intersectsBox(qmBox)) {
-            console.log("Player touched the question mark!");
-            // e.g., remove it from scene or trigger reward
-            // scene.remove(questionMark);
-            // questionMark = null;
-            const menu = document.getElementById("menu");
-            if (menu) menu.style.display = "block";
-
-            
+          console.log("Player touched a question mark!");
+          qNum = i;
+          const menu = document.getElementById(`menu${qNum}`);
+          if (menu) menu.style.display = "block";
         }
+      }
     }
+
+    let isTouchingTreeNow = false;
+
+    for (const tree of trees) {
+      treeBox.setFromObject(tree);
+      if (playerBox.intersectsBox(treeBox)) {
+        console.log("Player touched a tree!");
+        isTouchingTreeNow = true;
+      }
+    }
+
+    if (!isTouchingTree && isTouchingTreeNow) {
+      console.log("Player just started touching a tree!");
+    } else if (isTouchingTree && !isTouchingTreeNow) {
+      console.log("Player stopped touching the tree!");
+      // decreaseHealth(10);
+    }
+
+    isTouchingTree = isTouchingTreeNow;
     
   orbitControls.update();
   renderer.render(scene, camera);
@@ -396,63 +456,44 @@ function animate() {
 }
 
 
-
+var qNum = 0;
 document.body.appendChild(renderer.domElement);
 animate();
-const closeBtn = document.getElementById("closeBtn");
-    closeBtn?.addEventListener("click", () => {
-        if (!closeBtn) return; 
-        if (clickSoundCorrect.isPlaying) clickSoundCorrect.stop();
-        clickSoundCorrect.play();
 
-        closeBtn.classList.add('flash');
+for (let i = 0; i < 3; i++) {
+  const correctBtn = document.getElementById(`closeBtn${i}_2`);
+  const wrongBtn1 = document.getElementById(`closeBtn${i}`);
+  const wrongBtn2 = document.getElementById(`closeBtn${i}_3`);
 
-        // Remove the 'flash' class after the animation completes
-        setTimeout(() => {
-            closeBtn.classList.remove('flash');
-            const menu = document.getElementById("menu");
-        if (menu) menu.style.display = "none";
-        }, 300); 
+  if (correctBtn)
+    correctBtn.addEventListener("click", () => {
+      if (clickSoundCorrect.isPlaying) clickSoundCorrect.stop();
+      clickSoundCorrect.play();
+      correctBtn.classList.add('flash');
+      setTimeout(() => {
+          correctBtn.classList.remove('flash');
+          const menu = document.getElementById(`menu${i}`);
+      if (menu) menu.style.display = "none";
+      }, 300); 
+      // document.getElementById(`menu${i}`).style.display = "none";
+    });
 
-        
-    }
-);
-
-const closeBtn2 = document.getElementById("closeBtn2");
-    closeBtn2?.addEventListener("click", () => {
-        if (!closeBtn2) return; 
-
+  [wrongBtn1, wrongBtn2].forEach(btn => {
+    if (btn)
+      btn.addEventListener("click", () => {
+        decreaseHealth(40);
         if (clickSoundWrong.isPlaying) clickSoundWrong.stop();
         clickSoundWrong.play();
-
-        closeBtn2.classList.add('flash2');
-
-        // Remove the 'flash' class after the animation completes
+        btn.classList.add('flash2');
         setTimeout(() => {
-            closeBtn2.classList.remove('flash2');
-            const menu = document.getElementById("menu");
-        if (menu) menu.style.display = "none";
-        }, 300);         
-    }
-);
-
-const closeBtn3 = document.getElementById("closeBtn3");
-    closeBtn3?.addEventListener("click", () => {
-        if (!closeBtn3) return; 
-
-        if (clickSoundWrong.isPlaying) clickSoundWrong.stop();
-        clickSoundWrong.play();
-
-        closeBtn3.classList.add('flash2');
-
-        // Remove the 'flash' class after the animation completes
-        setTimeout(() => {
-            closeBtn3.classList.remove('flash2');
-            const menu = document.getElementById("menu");
-        if (menu) menu.style.display = "none";
-        }, 300);         
-    }
-);
+          btn.classList.remove('flash2');
+              const menu = document.getElementById(`menu${i}`);
+          if (menu) menu.style.display = "none";
+          }, 300); 
+        // document.getElementById(`menu${i}`).style.display = "none";
+      });
+  });
+}
 
 // RESIZE HANDLER
 function onWindowResize() {
