@@ -53,7 +53,7 @@ export class CharacterControls {
         this.walkSound = new THREE.Audio(this.audioListener)
 
         // Load sound file
-        audioLoader.load('/audio/walking.mp3', (buffer) => {
+        audioLoader.load('./audio/walking.mp3', (buffer) => {
             this.walkSound.setBuffer(buffer)
             this.walkSound.setLoop(true)
             this.walkSound.setVolume(0.5)
