@@ -17,6 +17,9 @@ camera.position.y = 5;
 camera.position.z = 5;
 camera.position.x = 0;
 
+const downRaycaster = new THREE.Raycaster();
+const downDirection = new THREE.Vector3(0, -1, 0);
+
 const listener = new THREE.AudioListener();
 camera.add(listener);
 const clickSoundCorrect = new THREE.Audio(listener);
@@ -113,6 +116,20 @@ new GLTFLoader().load('models/boy3.glb', function (gltf) {
     characterControls = new CharacterControls(model, mixer, animationsMap, orbitControls, camera,  'Idle', audioLoader)
 });
 
+let terrain: THREE.Object3D | null = null;
+
+new GLTFLoader().load('models/scene.gltf', function (gltf) {
+    terrain = gltf.scene;
+    terrain.traverse(function (object: any) {
+        if (object.isMesh) object.castShadow = true;
+    });
+    terrain.position.y = -0.25;
+    terrain.scale.set(50.0, 50.0, 50.0);
+    terrain.position.set(-22, -0.42, 10);
+    scene.add(terrain);
+});
+
+
 let questionMark: THREE.Object3D | null = null;
 let questionMarks: THREE.Object3D[] = [];
 
@@ -136,9 +153,9 @@ new GLTFLoader().load('models/qm2.glb', function (gltf) {
   // Place the group where you want the object
   // scene.add(questionMark);
   const positions = [
-    new THREE.Vector3(0, 1, 4),
-    new THREE.Vector3(2.5, 1, 0),
-    new THREE.Vector3(-1.5, 1, -3.5)
+    new THREE.Vector3(10, 1, -35),
+    new THREE.Vector3(11, 1, -15),
+    new THREE.Vector3(-1.5, 1, -20)
   ];
   positions.forEach(pos => {
     const qmClone = questionMark.clone(true);
@@ -148,45 +165,6 @@ new GLTFLoader().load('models/qm2.glb', function (gltf) {
   });
 });
 
-// https://douges.dev/static/tree.glb'
-// new GLTFLoader().load('models/giant_low_poly_tree.glb', function (gltf) {
-//     new GLTFLoader().load('models/giant_low_poly_tree.glb', function (gltf) {
-// // new GLTFLoader().load('models/low-poly_tree.glb', function (gltf) {
-//     const model = gltf.scene;
-//     const minLightness = 0.075;
-//     model.scale.set(1,1,.5);
-//      const warmthShift = -0.1;
-//     model.traverse(function (object: any) {
-//         if (object.isMesh) {
-            
-//             object.castShadow = false;
-//             object.receiveShadow = false;
-//             const color = object.material.color;
-
-//             // Get current HSL values
-//             const hsl: { h: number; s: number; l: number } = { h: 0, s: 0, l: 0 };
-//             // Get current HSL values
-//             color.getHSL(hsl);
-//             // Adjust saturation
-//             hsl.l = Math.max(hsl.l, minLightness);
-//             hsl.h = (hsl.h + warmthShift) % 1;
-//             hsl.s = 0.5; // 50% saturation
-//             // Apply the new HSL values to the color
-//             color.setHSL(hsl.h, 0.4, hsl.l);
-//         }
-//     });
-//     const positions = [
-//         new THREE.Vector3(0, 0, 0),
-//         new THREE.Vector3(5, 0, 2),
-//         new THREE.Vector3(-3, 0, -4)
-//     ];
-
-//     positions.forEach(pos => {
-//         const treeClone = model.clone(true); // true = deep clone (including children)
-//         treeClone.position.copy(pos);
-//         scene.add(treeClone);
-//     });
-// });
 
 // https://douges.dev/static/tree.glb
 // const trees = [];
@@ -233,9 +211,9 @@ const trees: THREE.Object3D[] = [];
 
   // Place multiple trees
   const positions = [
-    new THREE.Vector3(0, 0, 8),
-    new THREE.Vector3(5, 0, 0),
-    new THREE.Vector3(-3, 0, -7)
+    new THREE.Vector3(15, 0, -20),
+    new THREE.Vector3(8, 0, -45),
+    new THREE.Vector3(-3, 0, -10)
   ];
   positions.forEach(pos => {
     const treeClone = model.clone(true);
@@ -397,6 +375,11 @@ if (restartBtn) {
   });
 }
 
+let velocityY = 0;
+const GRAVITY = -20;     // downward pull
+const HEIGHT_OFFSET = 0.075;  // model's foot height
+
+
 function animate() {
     let mixerUpdateDelta = clock.getDelta();
     if (characterControls) {
@@ -415,8 +398,8 @@ function animate() {
       }
     }
 
-     if (characterControls && questionMarks.length > 0) {
-      playerBox.setFromObject(characterControls.model); // Update player bounding box
+    if (characterControls && questionMarks.length > 0) {
+    playerBox.setFromObject(characterControls.model); // Update player bounding box
 
       for (let i = 0; i < questionMarks.length; i++) {
         const qm = questionMarks[i];
@@ -430,6 +413,39 @@ function animate() {
         }
       }
     }
+
+    if (characterControls && terrain) {
+
+      const player = characterControls.model;
+
+      // 1. Apply gravity every frame
+      velocityY += GRAVITY * mixerUpdateDelta;
+      player.position.y += velocityY * mixerUpdateDelta;
+
+      // 2. Raycast DOWN to detect ground
+
+      downRaycaster.set(
+        new THREE.Vector3(player.position.x, player.position.y + 1, player.position.z),
+        new THREE.Vector3(0, -1, 0)
+      );
+
+      const hits = downRaycaster.intersectObject(terrain, true);
+
+      if (hits.length > 0) {
+          const groundY = hits[0].point.y + HEIGHT_OFFSET;
+
+          if (player.position.y < groundY) {
+              player.position.y = groundY;
+              velocityY = 0;
+          }
+      } else {
+
+        let delta = 0.25;
+        velocityY -= GRAVITY * delta;
+        player.position.y += velocityY * delta;
+      }
+    }
+
 
     let isTouchingTreeNow = false;
 
@@ -535,7 +551,7 @@ function generateFloor() {
     const floor = new THREE.Mesh(geometry, material)
     floor.receiveShadow = true
     floor.rotation.x = - Math.PI / 2
-    scene.add(floor)
+    // scene.add(floor)
 }
 
 function wrapAndRepeatTexture (map: THREE.Texture) {
@@ -548,7 +564,7 @@ function light() {
 
     const dirLight = new THREE.DirectionalLight(0xffffff, 1)
     dirLight.position.set(- 60, 100, - 10);
-    // dirLight.castShadow = true;
+    dirLight.castShadow = true;
     dirLight.shadow.camera.top = 50;
     dirLight.shadow.camera.bottom = - 50;
     dirLight.shadow.camera.left = - 50;

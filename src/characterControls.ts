@@ -23,8 +23,8 @@ export class CharacterControls {
     
     // constants
     fadeDuration: number = 0.2
-    runVelocity = 5
-    walkVelocity = 2
+    runVelocity = 10
+    walkVelocity = 6
     
     audioListener: THREE.AudioListener
     walkSound: THREE.Audio
@@ -68,7 +68,9 @@ export class CharacterControls {
 
     public update(delta: number, keysPressed: any) {
         const directionPressed = DIRECTIONS.some(key => keysPressed[key] == true)
-
+        // if (!canMove) {
+        //     play = 'Idle';   // do nothing: no movement, no rotation, no animation change
+        // }
         var play = '';
         if (directionPressed && this.toggleRun) {
             play = 'Run'
