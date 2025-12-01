@@ -11,6 +11,10 @@ import { mode } from '../webpack.config';
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xa8def0);
 
+const startTime: Date = new Date();
+
+
+
 // CAMERA
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.y = 5;
@@ -99,7 +103,7 @@ var characterControls: CharacterControls
 
 new GLTFLoader().load('models/boy3.glb', function (gltf) {
     const model = gltf.scene;
-    model.position.y = 0.075;
+    // model.position.y = 0.075;
     model.traverse(function (object: any) {
         if (object.isMesh) object.castShadow = true;
     });
@@ -382,6 +386,10 @@ const HEIGHT_OFFSET = 0.075;  // model's foot height
 
 function animate() {
     let mixerUpdateDelta = clock.getDelta();
+    const endTime: Date = new Date();
+
+    const elapsedTimeMs: number = endTime.getTime() - startTime.getTime();
+    const elapsedTimeSeconds: number = elapsedTimeMs / 1000;
     if (characterControls) {
         characterControls.update(mixerUpdateDelta, keysPressed);
     }
@@ -439,10 +447,11 @@ function animate() {
               velocityY = 0;
           }
       } else {
-
-        let delta = 0.25;
-        velocityY -= GRAVITY * delta;
-        player.position.y += velocityY * delta;
+        // if (elapsedTimeSeconds > 5.0) {
+          let delta = 0.25;
+          velocityY -= GRAVITY * delta;
+          player.position.y = Math.min(player.position.y + velocityY * delta, 6);
+        // }
       }
     }
 
