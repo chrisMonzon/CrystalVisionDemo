@@ -13,7 +13,7 @@ scene.background = new THREE.Color(0xa8def0);
 
 const startTime: Date = new Date();
 
-
+let score = 0;
 
 // CAMERA
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -480,6 +480,15 @@ function animate() {
   requestAnimationFrame(animate);
 }
 
+var correctAnswers = [0, 0, 0]
+function updateScore(index: number) {
+  const scoreDisplay = document.getElementById("score-display");
+  if (correctAnswers[index] === 0) {
+    correctAnswers[index] = 1;
+    score += 5;
+  }
+  if (scoreDisplay) scoreDisplay.textContent = score.toString();
+}
 
 var qNum = 0;
 document.body.appendChild(renderer.domElement);
@@ -495,9 +504,12 @@ for (let i = 0; i < 3; i++) {
       if (clickSoundCorrect.isPlaying) clickSoundCorrect.stop();
       clickSoundCorrect.play();
       correctBtn.classList.add('flash');
+      
       setTimeout(() => {
           correctBtn.classList.remove('flash');
           const menu = document.getElementById(`menu${i}`);
+          // score += 5;
+          updateScore(i);
       if (menu) menu.style.display = "none";
       }, 300); 
       // document.getElementById(`menu${i}`).style.display = "none";

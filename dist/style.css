@@ -38,6 +38,20 @@
     animation: flashRed 0.3s ease-in-out;
 }
 
+#score-container {
+  position: fixed;
+  top: 20px;
+  left: 5%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px; /* space between label and bar */
+  z-index: 9999;
+  font-family: sans-serif;
+  color: white;
+  text-shadow: 1px 1px 2px black;
+}
+
 #healthbar-container {
   position: fixed;
   top: 20px;
@@ -53,9 +67,14 @@
 }
 
 #health-label {
-  font-size: 16px;
+  font-size: 32px;
   font-weight: bold;
 }
+
+#score-label, #score-display{
+  font-size: 32px;
+  font-weight: bold;
+} 
 
 #healthbar-bg {
   width: 200px;
